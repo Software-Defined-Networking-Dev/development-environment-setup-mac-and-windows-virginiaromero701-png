@@ -1,0 +1,33 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Hello Message Test
+      id: hello-message-test
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Hello Message Test
+        setup-command: ''
+        command: cat hello_message.txt
+        input: ''
+        expected-output: Hello from my Dev Container
+        comparison-method: contains
+        timeout: 10
+        max-score: 50
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        HELLO-MESSAGE-TEST_RESULTS: "${{steps.hello-message-test.outputs.result}}"
+      with:
+        runners: hello-message-test
